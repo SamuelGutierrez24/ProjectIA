@@ -58,13 +58,14 @@ while cap.isOpened():
         # Convert the bundle data to a pandas DataFrame
         
         bundle_df = pd.DataFrame([bundle_data])
-
+        full_frame_face_landmarks = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(1,11) for axis in ['x', 'y', 'z']]
+        bundle_df = bundle_df.drop(columns=full_frame_face_landmarks)
         # Ensure the DataFrame columns are in the correct order
         #expected_columns = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(33) for axis in ['x', 'y', 'z']]
         #bundle_df = bundle_df[expected_columns]
 
         # Feed the data to the xgb_model
-        if(len(bundle_df.columns) == 495):
+        if(len(bundle_df.columns) == 345):
 
             meaning = ["['siting_down']", "['spinning']", "['standing_up']",
                         "['walking_away']", "['walking_to_camera']"]
