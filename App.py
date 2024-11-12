@@ -3,6 +3,7 @@ import mediapipe as mp
 import pickle
 import pandas as pd
 from collections import deque
+import numpy as np
 
 # Load the XGBoost model
 with open('xgb_model.pkl', 'rb') as model_file:
@@ -47,33 +48,37 @@ while cap.isOpened():
     # Process the bundle
     if len(results_bundle) == 5:
         # Create a structured dictionary for the bundle
-        bundle_data = {}
+        bundle_data = []
         for i, result in enumerate(results_bundle):
             if result.pose_landmarks:
                 for j, landmark in enumerate(result.pose_landmarks.landmark):
-                    bundle_data[f'landmark_{j}_x_frame_{i+1}'] = landmark.x
-                    bundle_data[f'landmark_{j}_y_frame_{i+1}'] = landmark.y
-                    bundle_data[f'landmark_{j}_z_frame_{i+1}'] = landmark.z
+                    if j not in range(1, 11):  
+                        bundle_data.append(landmark.x)
+                        bundle_data.append(landmark.y)
+                        bundle_data.append(landmark.z)
 
         # Convert the bundle data to a pandas DataFrame
         
-        bundle_df = pd.DataFrame([bundle_data])
-        full_frame_face_landmarks = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(1,11) for axis in ['x', 'y', 'z']]
-        bundle_df = bundle_df.drop(columns=full_frame_face_landmarks)
+        # bundle_df = pd.DataFrame([bundle_data])
+        # full_frame_face_landmarks = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(1,11) for axis in ['x', 'y', 'z']]
+        # try:
+        #     bundle_df = bundle_df.drop(columns=full_frame_face_landmarks)
+        # except:
+        #     pass
         # Ensure the DataFrame columns are in the correct order
         #expected_columns = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(33) for axis in ['x', 'y', 'z']]
         #bundle_df = bundle_df[expected_columns]
 
         # Feed the data to the xgb_model
-        if(len(bundle_df.columns) == 345):
-
+        #if(len(bundle_df.columns) == 345):
+        if(len(bundle_data) == 345):
             meaning = ["['siting_down']", "['spinning']", "['standing_up']",
                         "['walking_away']", "['walking_to_camera']"]
-            prediction = xgb_model.predict(bundle_df)
+            prediction = xgb_model.predict(np.array([bundle_data]))
             print(f'Prediction: {meaning[prediction[0]]}')
 
-            # Display the result on the screen
-            cv2.putText(frame, f'Prediction: {prediction[0]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        # Display the result on the screen
+        cv2.putText(frame, f'Prediction: {prediction[0]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
 # Release resources
 cap.release()
