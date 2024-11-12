@@ -40,7 +40,7 @@ while cap.isOpened():
         mp.solutions.drawing_utils.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
     # Display the frame
-    cv2.imshow('MediaPipe Pose', frame)
+    
 
     if cv2.waitKey(5) & 0xFF == 27:
         break
@@ -77,9 +77,9 @@ while cap.isOpened():
             prediction = xgb_model.predict(np.array([bundle_data]))
             print(f'Prediction: {meaning[prediction[0]]}')
 
-        # Display the result on the screen
-        cv2.putText(frame, f'Prediction: {prediction[0]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-
+            # Display the result on the screen
+            cv2.putText(frame, f'Prediction: {meaning[prediction[0]]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+    cv2.imshow('MediaPipe Pose', frame)
 # Release resources
 cap.release()
 cv2.destroyAllWindows()
