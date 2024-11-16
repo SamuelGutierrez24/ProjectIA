@@ -6,10 +6,21 @@ from collections import deque
 import numpy as np
 from sklearn.discriminant_analysis import StandardScaler
 
+a = StandardScaler()
+
+
 # Load the XGBoost model
 with open('xgb_model.pkl', 'rb') as model_file:
     xgb_model = pickle.load(model_file)
+    # Load the scaler
 
+# Load the scaler
+with open('scaler.pkl', 'rb') as scaler_file:
+    scaler = pickle.load(scaler_file)
+
+    # Ensure scaler is of type StandardScaler
+    if not isinstance(scaler, StandardScaler):
+        raise TypeError("Scaler must be of type StandardScaler")
 # Load normalization factors
 normalization_factors_df = pd.read_csv('normalization_factors.csv')
 normalization_factors = normalization_factors_df['Normalization Factor'].values
@@ -55,7 +66,7 @@ while cap.isOpened():
         # Create a structured dictionary for the bundle
         bundle_data = []
         for n in range(33):
-            for nn in range(5):
+            for nn in range(5):     
              result = results_bundle[nn]
              if result.pose_landmarks:
                     landmark = result.pose_landmarks.landmark[n]
@@ -64,17 +75,16 @@ while cap.isOpened():
                         bundle_data.append(landmark.x)
                         bundle_data.append(landmark.y)
                         bundle_data.append(landmark.z)
+                        bundle_data.append(landmark.visibility)
 
         # Normalize the bundle data
-        normalized_bundle_data = [bundle_data[i] / normalization_factors[i] for i in range(len(bundle_data))]
-        print(normalized_bundle_data)
+        #normalized_bundle_data = [bundle_data[i] / normalization_factors[i] for i in range(len(bundle_data))]
         # Feed the normalized data to the xgb_model
-        if len(normalized_bundle_data) == 345:
-            scaler = StandardScaler()
+        if len(bundle_data) == 460 :
             meaning = ["['siting_down']", "['spinning']", "['standing_up']",
                         "['walking_away']", "['walking_to_camera']", 'unknown']
             
-            prediction = xgb_model.predict(scaler.fit_transform(np.array([normalized_bundle_data])))
+            prediction = xgb_model.predict(scaler.fit_transform(np.array([bundle_data])))
             # Display the result on the screen
             cv2.putText(frame, f'Prediction: {meaning[prediction[0]]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
     cv2.imshow('MediaPipe Pose', frame)
