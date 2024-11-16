@@ -4,10 +4,15 @@ import pickle
 import pandas as pd
 from collections import deque
 import numpy as np
+from sklearn.discriminant_analysis import StandardScaler
 
 # Load the XGBoost model
 with open('xgb_model.pkl', 'rb') as model_file:
     xgb_model = pickle.load(model_file)
+
+# Load normalization factors
+normalization_factors_df = pd.read_csv('normalization_factors.csv')
+normalization_factors = normalization_factors_df['Normalization Factor'].values
 
 # Initialize MediaPipe Pose model
 mp_pose = mp.solutions.pose
@@ -49,34 +54,27 @@ while cap.isOpened():
     if len(results_bundle) == 5:
         # Create a structured dictionary for the bundle
         bundle_data = []
-        for i, result in enumerate(results_bundle):
-            if result.pose_landmarks:
-                for j, landmark in enumerate(result.pose_landmarks.landmark):
-                    if j not in range(1, 11):  
+        for n in range(33):
+            for nn in range(5):
+             result = results_bundle[nn]
+             if result.pose_landmarks:
+                    landmark = result.pose_landmarks.landmark[n]
+                    if n not in range(1, 11): 
+                        #print("i:", nn, "j:", n)
                         bundle_data.append(landmark.x)
                         bundle_data.append(landmark.y)
                         bundle_data.append(landmark.z)
 
-        # Convert the bundle data to a pandas DataFrame
-        
-        # bundle_df = pd.DataFrame([bundle_data])
-        # full_frame_face_landmarks = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(1,11) for axis in ['x', 'y', 'z']]
-        # try:
-        #     bundle_df = bundle_df.drop(columns=full_frame_face_landmarks)
-        # except:
-        #     pass
-        # Ensure the DataFrame columns are in the correct order
-        #expected_columns = [f'landmark_{j}_{axis}_frame_{i+1}' for i in range(5) for j in range(33) for axis in ['x', 'y', 'z']]
-        #bundle_df = bundle_df[expected_columns]
-
-        # Feed the data to the xgb_model
-        #if(len(bundle_df.columns) == 345):
-        if(len(bundle_data) == 345):
+        # Normalize the bundle data
+        normalized_bundle_data = [bundle_data[i] / normalization_factors[i] for i in range(len(bundle_data))]
+        print(normalized_bundle_data)
+        # Feed the normalized data to the xgb_model
+        if len(normalized_bundle_data) == 345:
+            scaler = StandardScaler()
             meaning = ["['siting_down']", "['spinning']", "['standing_up']",
-                        "['walking_away']", "['walking_to_camera']"]
-            prediction = xgb_model.predict(np.array([bundle_data]))
-            print(f'Prediction: {meaning[prediction[0]]}')
-
+                        "['walking_away']", "['walking_to_camera']", 'unknown']
+            
+            prediction = xgb_model.predict(scaler.fit_transform(np.array([normalized_bundle_data])))
             # Display the result on the screen
             cv2.putText(frame, f'Prediction: {meaning[prediction[0]]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
     cv2.imshow('MediaPipe Pose', frame)
