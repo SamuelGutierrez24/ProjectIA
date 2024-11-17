@@ -229,7 +229,9 @@ Column,Normalization Factor
 227,1.1012157201766968
 228,1.0
 229,1.0
-left_leg_speed,1.0
-right_leg_speed,1.0
-left_arm_speed,1.0
-right_arm_speed,1.0
+left_shoulder_delta_z,1.0
+right_shoulder_delta_z,1.0
+left_hip_delta_z,1.0
+right_hip_delta_z,1.0
+left_shoulder_delta_y,1.0
+right_shoulder_delta_y,1.0
