@@ -65,11 +65,7 @@ while cap.isOpened():
         speeds = []
         for i in range(1, len(positions)):
             # Calculate the Euclidean distance between consecutive positions
-            distance = np.sqrt(
-                (positions[i][0] - positions[i-1][0])**2 +
-                (positions[i][1] - positions[i-1][1])**2 +
-                (positions[i][2] - positions[i-1][2])**2
-            )
+            distance = (positions[i] - positions[i-1])
             # Assuming the time interval between each position is 1 unit
             speed = distance / 1  # Replace 1 with the actual time interval if different
             speeds.append(speed)
@@ -104,36 +100,35 @@ while cap.isOpened():
                 pass
             complete_data = np.append(complete_data,bundle_data)  
         if(len(complete_data) == 230):
-            right_leg_positions = [
-                [complete_data[35], complete_data[36], complete_data[37]],
-                [complete_data[81], complete_data[82], complete_data[83]],
-                [complete_data[127], complete_data[128], complete_data[129]],
-                [complete_data[173], complete_data[174], complete_data[175]],
-                [complete_data[219], complete_data[220], complete_data[221]]
-            ]
-
             left_leg_positions = [
-                [complete_data[32], complete_data[33], complete_data[34]],
-                [complete_data[78], complete_data[79], complete_data[80]],
-                [complete_data[124], complete_data[125], complete_data[126]],
-                [complete_data[170], complete_data[171], complete_data[172]],
-                [complete_data[216], complete_data[217], complete_data[218]]
+                complete_data[6],
+                complete_data[52],
+                complete_data[98],
+                complete_data[144],
+                complete_data[190]
             ]
 
+            right_leg_positions = [
+                complete_data[10],
+                complete_data[56],
+                complete_data[102],
+                complete_data[148],
+                complete_data[198]
+                ]
             left_arm_positions = [
-                [complete_data[12], complete_data[13], complete_data[14]],
-                [complete_data[58], complete_data[59], complete_data[60]],
-                [complete_data[104], complete_data[105], complete_data[106]],
-                [complete_data[150], complete_data[151], complete_data[152]],
-                [complete_data[196], complete_data[197], complete_data[198]]
+                complete_data[14],
+                complete_data[60],
+                complete_data[106],
+                complete_data[152],
+                complete_data[198]
             ]
 
             right_arm_positions = [
-                [complete_data[15], complete_data[16], complete_data[17]],
-                [complete_data[61], complete_data[62], complete_data[63]],
-                [complete_data[107], complete_data[108], complete_data[109]],
-                [complete_data[153], complete_data[154], complete_data[155]],
-                [complete_data[199], complete_data[200], complete_data[201]]
+                complete_data[29],
+                complete_data[75],
+                complete_data[121],
+                complete_data[167],
+                complete_data[213]
             ]
             left_leg_speed = calculate_apendix_speed(left_leg_positions)
             right_leg_speed = calculate_apendix_speed(right_leg_positions)
