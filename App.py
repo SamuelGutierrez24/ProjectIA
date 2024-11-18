@@ -5,14 +5,14 @@ import pandas as pd
 from collections import deque
 import numpy as np
 from sklearn.discriminant_analysis import StandardScaler
+import joblib
 
 a = StandardScaler()
 
 
 # Load the XGBoost model
-with open('xgb_model.pkl', 'rb') as model_file:
-    xgb_model = pickle.load(model_file)
-    # Load the scaler
+xgb_model = joblib.load('xgb_model.pkl')
+# Load the scaler
 
 # Load the scaler
 with open('scaler.pkl', 'rb') as scaler_file:
