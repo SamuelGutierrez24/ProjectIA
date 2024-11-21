@@ -281,6 +281,7 @@ while cap.isOpened():
             right_arm_delta_y = calculate_apendix_speed(right_arm_positions_y)
             left_hand_delta_y = calculate_apendix_speed(left_hand_positions_z)
             right_hand_delta_y = calculate_apendix_speed(right_hand_positions_z)
+            """
             left_shoulder_positions_x = [
                 complete_data[4],
                 complete_data[50],
@@ -388,11 +389,13 @@ while cap.isOpened():
             right_arm_delta_x = calculate_apendix_speed(right_arm_positions_x)
             left_hand_delta_x = calculate_apendix_speed(left_hand_positions_x)
             right_hand_delta_x = calculate_apendix_speed(right_hand_positions_x)
-
-            complete_data = np.append(complete_data, [
-                left_shoulder_delta_x, right_shoulder_delta_x, left_hip_delta_x, right_hip_delta_x,
+            
+            left_shoulder_delta_x, right_shoulder_delta_x, left_hip_delta_x, right_hip_delta_x,
                 left_leg_delta_x, right_leg_delta_x, left_foot_delta_x, right_foot_delta_x,
                 left_arm_delta_x, right_arm_delta_x, left_hand_delta_x, right_hand_delta_x,
+"""
+            complete_data = np.append(complete_data, [
+                
                 left_shoulder_delta_z, right_shoulder_delta_z, left_hip_delta_z, right_hip_delta_z,
                 left_leg_delta_z, right_leg_delta_z, left_foot_delta_z, right_foot_delta_z,
                 left_arm_delta_z, right_arm_delta_z, left_hand_delta_z, right_hand_delta_z,
@@ -402,10 +405,10 @@ while cap.isOpened():
 
         bundle = []
         bundle.append(complete_data)
-        if len(complete_data) ==262:
-            meaning = ["['siting_down']", "['spinning']", "['standing_up']", "['walking_away']", "['walking_to_camera']", 'unknown']
+        if len(complete_data) == 250:
+            meaning = ["['siting_down']", "['spinning']", "['standing_up']", "['walking_to_camera']", "['walking_away']", 'unknown']
             prediction = xgb_model.predict(scaler.transform(np.array(bundle)))
-            cv2.putText(frame, f'Prediction: {meaning[prediction[0]]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(frame, f'Prediction: {meaning[prediction[0]]}', (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
     cv2.imshow('MediaPipe Pose', frame)
 
 # Release resources
