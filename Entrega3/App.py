@@ -10,10 +10,10 @@ import joblib
 #Application to try out the functionality of the model
 
 # Load the XGBoost model
-xgb_model = joblib.load('xgb_model.pkl')
+xgb_model = joblib.load('Entrega3/xgb_model.pkl')
 
 # Load the scaler
-with open('scaler.pkl', 'rb') as scaler_file:
+with open('Entrega3/scaler.pkl', 'rb') as scaler_file:
     scaler = pickle.load(scaler_file)
 
     # Ensure scaler is of type StandardScaler
